@@ -5,9 +5,8 @@ name: Python package
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -32,8 +31,12 @@ jobs:
     - name: Build Wheel
       run: python -m build --wheel
 
-    - name: Upload Wheel Artifact
+    - name: Get Tag Name
+      id: get_tag
+      run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Upload Wheel Artifact (with tag)
       uses: actions/upload-artifact@v3
       with:
-        name: project-wheel
-        path: dist/*.whl  
+        name: cloudstorage-${{ steps.get_tag.outputs.tag_name }}.whl
+        path: dist/*.whl
